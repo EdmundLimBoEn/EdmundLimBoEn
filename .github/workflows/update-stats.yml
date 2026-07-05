@@ -1,0 +1,70 @@
+name: Update stats
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute repo and commit counts
+        id: stats
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOGIN: ${{ github.repository_owner }}
+        run: |
+          repos=$(gh api "users/${LOGIN}" --jq '.public_repos')
+
+          years=$(gh api graphql -f query='
+            query($login: String!) {
+              user(login: $login) { contributionsCollection { contributionYears } }
+            }' -f login="$LOGIN" --jq '.data.user.contributionsCollection.contributionYears[]')
+
+          commits=0
+          for y in $years; do
+            c=$(gh api graphql -f query='
+              query($login: String!, $from: DateTime!, $to: DateTime!) {
+                user(login: $login) {
+                  contributionsCollection(from: $from, to: $to) { totalCommitContributions }
+                }
+              }' -f login="$LOGIN" -f from="${y}-01-01T00:00:00Z" -f to="${y}-12-31T23:59:59Z" \
+              --jq '.data.user.contributionsCollection.totalCommitContributions')
+            commits=$((commits + c))
+          done
+
+          echo "repos=$repos" >> "$GITHUB_OUTPUT"
+          echo "commits=$commits" >> "$GITHUB_OUTPUT"
+
+      - name: Update README
+        env:
+          REPOS: ${{ steps.stats.outputs.repos }}
+          COMMITS: ${{ steps.stats.outputs.commits }}
+        run: |
+          python3 - <<'EOF'
+          import os, re
+          repos, commits = os.environ["REPOS"], os.environ["COMMITS"]
+          text = open("README.md").read()
+          text = re.sub(
+              r"(<!-- STATS:START -->\n).*?(\n<!-- STATS:END -->)",
+              rf"\g<1>{repos} repositories, {commits} commits, and counting.\g<2>",
+              text,
+              flags=re.S,
+          )
+          open("README.md", "w").write(text)
+          EOF
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet README.md && exit 0
+          git add README.md
+          git commit -m "Update repo/commit stats"
+          git push
