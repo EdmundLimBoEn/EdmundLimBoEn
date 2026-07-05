@@ -24,4 +24,7 @@ A student with too much time, too many problems, a love for tech, and a claude s
 
 ### 📊 Stats
 
+![Repositories](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Fusers%2FEdmundLimBoEn&query=%24.public_repos&label=repositories&style=for-the-badge)
+![Commits](https://img.shields.io/badge/commits-269%20and%20counting-blue?style=for-the-badge)
+
 ![GitFut card](https://gitfut.com/EdmundLimBoEn/opengraph-image)
