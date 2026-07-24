@@ -1,6 +1,6 @@
 # Hi, I'm Edmund 👋
 
-A student with too much time, too many problems, a love for tech, and a claude sub.
+A student with too much time, too many problems, a love for tech, and a codex sub.
 
 [Twitter](https://x.com/edmundlimboen) · [Instagram](https://www.instagram.com/edmundlimboen/) · [Website](https://edmundlim.systems)
 
