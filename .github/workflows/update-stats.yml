@@ -14,11 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compute repo and commit counts
+      - name: Compute repo, commit, and merged PR counts
         id: stats
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LOGIN: ${{ github.repository_owner }}
+          # optional STATS_GH_TOKEN (classic PAT with repo scope) includes private merged PRs; without it, public-only count is written.
+          PR_GH_TOKEN: ${{ secrets.STATS_GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           repos=$(gh api "users/${LOGIN}" --jq '.public_repos')
 
@@ -39,21 +41,30 @@ jobs:
             commits=$((commits + c))
           done
 
+          merged_prs=$(GH_TOKEN="$PR_GH_TOKEN" gh api -X GET search/issues \
+            -f q="author:${LOGIN} is:pr is:merged" -f per_page=1 --jq .total_count) \
+          || merged_prs=$(GH_TOKEN="$PR_GH_TOKEN" gh api graphql -f query='
+            query($q: String!) {
+              search(query: $q, type: ISSUE, first: 1) { issueCount }
+            }' -f q="author:${LOGIN} is:pr is:merged" --jq '.data.search.issueCount')
+
           echo "repos=$repos" >> "$GITHUB_OUTPUT"
           echo "commits=$commits" >> "$GITHUB_OUTPUT"
+          echo "merged_prs=$merged_prs" >> "$GITHUB_OUTPUT"
 
       - name: Update README
         env:
           REPOS: ${{ steps.stats.outputs.repos }}
           COMMITS: ${{ steps.stats.outputs.commits }}
+          MERGED_PRS: ${{ steps.stats.outputs.merged_prs }}
         run: |
           python3 - <<'EOF'
           import os, re
-          repos, commits = os.environ["REPOS"], os.environ["COMMITS"]
+          repos, commits, merged_prs = os.environ["REPOS"], os.environ["COMMITS"], os.environ["MERGED_PRS"]
           text = open("README.md").read()
           text = re.sub(
               r"(<!-- STATS:START -->\n).*?(\n<!-- STATS:END -->)",
-              rf"\g<1>{repos} repositories, {commits} commits, and counting.\g<2>",
+              rf"\g<1>{repos} repositories, {commits} commits, {merged_prs} merged pull requests, and counting.\g<2>",
               text,
               flags=re.S,
           )
@@ -66,5 +77,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git diff --quiet README.md && exit 0
           git add README.md
-          git commit -m "Update repo/commit stats"
+          git commit -m "Update repo/commit/PR stats"
           git push
