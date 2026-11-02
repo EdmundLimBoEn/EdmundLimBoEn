@@ -17,10 +17,10 @@ A student with too much time, too many problems, a love for tech, and a codex su
 
 ### 📦 Projects
 
-- **[exam-prep-skill](https://github.com/EdmundLimBoEn/exam-prep-skill)** — Turn NotebookLM notebooks into tailored study packs, practice quizzes, and live oral drills. One-line install. Any subject.
-- **[openbooth](https://github.com/EdmundLimBoEn/openbooth)** — A little app made because I didn't want to pay for a photobooth app.
+- **[Lazy Man's Reminders / Notepad](https://github.com/EdmundLimBoEn/lazy-mans-reminders)** — [np.sillyapps.co](https://np.sillyapps.co)
+- **[Stage Wand](https://github.com/EdmundLimBoEn/stage-wand)**
+- **[UsageWidget](https://github.com/EdmundLimBoEn/UsageWidget)**
 - **[ipad-webbooth](https://github.com/EdmundLimBoEn/ipad-webbooth)** — A quick and dirty vibecoded app, to help a friend out.
-- **[Personal-Website](https://github.com/EdmundLimBoEn/Personal-Website)** — Small website, one-shotted by Fable, with fancy animations.
 
 ### 📊 Stats
 
