@@ -19,7 +19,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LOGIN: ${{ github.repository_owner }}
-          # optional STATS_GH_TOKEN (classic PAT with repo scope) includes private merged PRs; without it, public-only count is written.
+          # optional STATS_GH_TOKEN (classic PAT with repo scope) used for the search; the count is public repos only.
           PR_GH_TOKEN: ${{ secrets.STATS_GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           repos=$(gh api "users/${LOGIN}" --jq '.public_repos')
@@ -42,11 +42,11 @@ jobs:
           done
 
           merged_prs=$(GH_TOKEN="$PR_GH_TOKEN" gh api -X GET search/issues \
-            -f q="author:${LOGIN} is:pr is:merged" -f per_page=1 --jq .total_count) \
+            -f q="author:${LOGIN} is:pr is:merged is:public" -f per_page=1 --jq .total_count) \
           || merged_prs=$(GH_TOKEN="$PR_GH_TOKEN" gh api graphql -f query='
             query($q: String!) {
               search(query: $q, type: ISSUE, first: 1) { issueCount }
-            }' -f q="author:${LOGIN} is:pr is:merged" --jq '.data.search.issueCount')
+            }' -f q="author:${LOGIN} is:pr is:merged is:public" --jq '.data.search.issueCount')
 
           echo "repos=$repos" >> "$GITHUB_OUTPUT"
           echo "commits=$commits" >> "$GITHUB_OUTPUT"
