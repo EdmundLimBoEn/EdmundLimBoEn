@@ -17,7 +17,7 @@ A student with too much time, too many problems, a love for tech, and a codex su
 
 ### 📦 Projects
 
-- **[Lazy Man's Reminders / Notepad](https://github.com/EdmundLimBoEn/lazy-mans-reminders)** — [np.sillyapps.co](https://np.sillyapps.co)
+- **[Lazy Man's Reminders / Notepad](https://github.com/EdmundLimBoEn/lazy-mans-reminders)** — [notepads.dev](https://notepads.dev)
 - **[Stage Wand](https://github.com/EdmundLimBoEn/stage-wand)**
 - **[UsageWidget](https://github.com/EdmundLimBoEn/UsageWidget)**
 - **[ipad-webbooth](https://github.com/EdmundLimBoEn/ipad-webbooth)** — A quick and dirty vibecoded app, to help a friend out.
